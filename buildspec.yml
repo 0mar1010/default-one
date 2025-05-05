@@ -2,12 +2,22 @@ version: 0.2
 phases:
   install:
     commands:
-      - apt-get install -y php8.1-cli php8.1-mbstring php8.1-zip unzip
-      - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+      # Install PHP 8.1 and extensions
+      - apt-get update -y
+      - apt-get install -y php8.1-cli php8.1-mbstring php8.1-zip php8.1-xml unzip
+      
+      # Install Composer (local installation)
+      - curl -sS https://getcomposer.org/installer | php -- --install-dir=./ --filename=composer
   build:
     commands:
-      - composer install --no-interaction --no-progress
+      # Install dependencies (no dev dependencies in production)
+      - php composer install --no-interaction --no-progress --no-dev
 artifacts:
   files:
     - '**/*'
+  base-directory: .  # Explicitly specify the root directory
   discard-paths: no
+cache:
+  paths:
+    - vendor/**/*
+    - .env  # Optional: Cache environment file if needed
